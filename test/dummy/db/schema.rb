@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_10_05_164234) do
+ActiveRecord::Schema.define(version: 2019_10_08_191655) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -177,6 +177,62 @@ ActiveRecord::Schema.define(version: 2019_10_05_164234) do
   create_table "wf_workflows", comment: "Parent table for the workflow definition", force: :cascade do |t|
     t.string "name"
     t.text "description"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "wfc_arcs", force: :cascade do |t|
+    t.bigint "workflow_id"
+    t.bigint "transition_id"
+    t.bigint "place_id"
+    t.integer "direction", default: 0, comment: "0-in, 1-out"
+    t.integer "arc_type", default: 0, comment: "0-seq,1-explicit_or_split, 2-implicit_or_split, 3-or_join, 4-and_split, 5-and_join"
+    t.string "condition_field", comment: "guard field"
+    t.string "condition_op", comment: "guard operator: >,<,==,"
+    t.string "condition_value", comment: "guard value"
+    t.string "condition_exp", comment: "guard expression"
+    t.string "condition_field_type", comment: "guard field type: Boolean/Integer/Date/String/Float/Datetime"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "wfc_places", force: :cascade do |t|
+    t.bigint "workflow_id"
+    t.string "name"
+    t.text "description"
+    t.integer "sort_order", default: 0
+    t.integer "place_type", default: 0, comment: "类型：0-normal，1-start，2-end"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "wfc_transition_assignments", force: :cascade do |t|
+    t.bigint "workflow_id"
+    t.bigint "transition_id"
+    t.string "assignable_type", comment: "Assign Type from Application: Group or Role or User etc."
+    t.string "assignable_id", comment: "Assign ID from Application: group_id or role_id or user_id etc"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "wfc_transitions", force: :cascade do |t|
+    t.string "name"
+    t.text "description"
+    t.bigint "workflow_id"
+    t.integer "sort_order", default: 0
+    t.integer "trigger_limit", comment: "use with timed trigger, after x minitues, trigger exec"
+    t.integer "trigger_type", default: 0, comment: "0-user,1-automatic, 2-message,3-time"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "wfc_workflows", force: :cascade do |t|
+    t.string "name"
+    t.text "description"
+    t.boolean "is_valid", default: false
+    t.boolean "is_draft", default: true
+    t.bigint "creator_id"
+    t.text "error_msg"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
